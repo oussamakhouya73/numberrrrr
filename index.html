@@ -27,12 +27,17 @@
     const REWARD_ACCOUNT = 'oussama_khouya_10';
 
     const NumberGuessingGame = () => {
+      // تحميل البيانات المخزنة في LocalStorage عند تحميل الصفحة
+      const storedAttempts = parseInt(localStorage.getItem('attempts')) || 0;
+      const storedPreviousAttempts = JSON.parse(localStorage.getItem('previousAttempts')) || [];
+      const storedRemainingAttempts = parseInt(localStorage.getItem('remainingAttempts')) || 20;
+
       const [number, setNumber] = React.useState('');
-      const [attempts, setAttempts] = React.useState(0);
-      const [previousAttempts, setPreviousAttempts] = React.useState([]);
+      const [attempts, setAttempts] = React.useState(storedAttempts);
+      const [previousAttempts, setPreviousAttempts] = React.useState(storedPreviousAttempts);
       const [error, setError] = React.useState('');
       const [success, setSuccess] = React.useState(false);
-      const [remainingAttempts, setRemainingAttempts] = React.useState(20);
+      const [remainingAttempts, setRemainingAttempts] = React.useState(storedRemainingAttempts);
 
       const handleNumberChange = (e) => {
         const value = e.target.value.replace(/[^0-9]/g, '');
@@ -67,6 +72,11 @@
         }
 
         setNumber('');
+
+        // تخزين البيانات في LocalStorage بعد كل محاولة
+        localStorage.setItem('attempts', newAttempts);
+        localStorage.setItem('previousAttempts', JSON.stringify(newPreviousAttempts));
+        localStorage.setItem('remainingAttempts', 20 - newAttempts);
 
         // عرض إعلان بيني عند الضغط على الزر
         (adsbygoogle = window.adsbygoogle || []).push({});
