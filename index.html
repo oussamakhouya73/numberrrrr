@@ -18,7 +18,7 @@
     });
   </script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<body class="bg-gray-100 flex items-start justify-center min-h-screen">
 
   <div id="root"></div>
 
@@ -27,7 +27,6 @@
     const REWARD_ACCOUNT = 'oussama_khouya_10';
 
     const NumberGuessingGame = () => {
-      // تحميل البيانات المخزنة في LocalStorage عند تحميل الصفحة
       const storedAttempts = parseInt(localStorage.getItem('attempts')) || 0;
       const storedPreviousAttempts = JSON.parse(localStorage.getItem('previousAttempts')) || [];
       const storedRemainingAttempts = parseInt(localStorage.getItem('remainingAttempts')) || 20;
@@ -73,38 +72,36 @@
 
         setNumber('');
 
-        // تخزين البيانات في LocalStorage بعد كل محاولة
         localStorage.setItem('attempts', newAttempts);
         localStorage.setItem('previousAttempts', JSON.stringify(newPreviousAttempts));
         localStorage.setItem('remainingAttempts', 20 - newAttempts);
 
-        // عرض إعلان بيني عند الضغط على الزر
         (adsbygoogle = window.adsbygoogle || []).push({});
       };
 
       return (
-        <div className="w-full max-w-md mx-auto bg-white p-6 rounded shadow md:max-w-lg lg:max-w-xl">
-          <h1 className="text-2xl font-bold mb-4 text-center sm:text-3xl">Number Guessing Game</h1>
-          <div className="text-sm text-gray-500 mb-4 text-center">Remaining attempts today: {remainingAttempts}/20</div>
+        <div className="w-full max-w-md mx-auto bg-white p-6 rounded shadow mt-10">
+          <h1 className="text-2xl font-bold mb-4">Number Guessing Game</h1>
+          <div className="text-sm text-gray-500 mb-4">Remaining attempts today: {remainingAttempts}/20</div>
           <input
             type="text"
             value={number}
             onChange={handleNumberChange}
             placeholder="Enter a 7-digit number"
-            className="block w-full p-2 border border-gray-300 rounded mb-4 text-center text-lg sm:text-xl"
+            className="block w-full p-2 border border-gray-300 rounded mb-4 text-center"
             maxLength={7}
             disabled={success || remainingAttempts <= 0}
           />
-          {error && <div className="text-red-500 mb-2 text-center">{error}</div>}
+          {error && <div className="text-red-500 mb-2">{error}</div>}
           {success && (
-            <div className="text-green-500 mb-4 text-center">
+            <div className="text-green-500 mb-4">
               Congratulations, you found the correct number!
               <div>Send it to this account to claim your reward: {REWARD_ACCOUNT}</div>
             </div>
           )}
           <button
             onClick={handleSubmit}
-            className="w-full bg-blue-500 text-white py-2 rounded text-lg sm:text-xl"
+            className="w-full bg-blue-500 text-white py-2 rounded"
             disabled={success || remainingAttempts <= 0 || number.length !== 7}
           >
             Submit Number
