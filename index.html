@@ -4,126 +4,181 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Number Guessing Game</title>
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f4f7fb;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
+      height: 100vh;
     }
-    .container {
+
+    .card {
       width: 100%;
       max-width: 400px;
-      background-color: #fff;
-      padding: 20px;
+      background: #fff;
       border-radius: 8px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      text-align: center;
     }
+
+    .card-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
     .input {
       width: 100%;
-      padding: 12px;
+      padding: 10px;
+      font-size: 16px;
       margin: 10px 0;
-      border-radius: 6px;
       border: 1px solid #ccc;
-      font-size: 16px;
-    }
-    .btn {
-      width: 100%;
-      padding: 12px;
-      background-color: #4a5568;
-      color: white;
-      border-radius: 6px;
-      cursor: pointer;
-      border: none;
-      font-size: 16px;
-    }
-    .remaining-attempts {
-      margin-top: 10px;
-      font-size: 14px;
-      color: #718096;
-    }
-    .attempts-list {
-      margin-top: 20px;
-      font-size: 14px;
-      color: #4a5568;
-    }
-    .attempt {
-      padding: 8px;
-      background-color: #edf2f7;
-      margin-bottom: 8px;
       border-radius: 4px;
     }
-    .result {
-      font-size: 18px;
-      color: #2d3748;
-      margin-top: 10px;
-      font-weight: bold;
+
+    .button {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .alert {
+      margin: 10px 0;
+      padding: 10px;
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+      border-radius: 4px;
+    }
+
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .attempts {
+      text-align: left;
+      margin-top: 20px;
+    }
+
+    .attempt {
+      background: #f1f3f5;
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 5px;
     }
   </style>
 </head>
-
 <body>
-  <div class="container">
-    <h1 class="text-center text-xl font-bold">Number Guessing Game</h1>
-    <div class="remaining-attempts">
-      Remaining attempts today: <span id="remaining-attempts">20</span>/20
-    </div>
-    <input id="guess-input" class="input" type="text" placeholder="Enter a 7-digit number">
-    <button class="btn" onclick="checkGuess()">Submit Number</button>
-    <div class="result" id="result"></div>
-    <div class="attempts-list" id="previous-attempts">
-      <h3>Previous Attempts:</h3>
-    </div>
-  </div>
+  <div id="app"></div>
 
   <script>
-    const CORRECT_NUMBER = '1234567';  // Replace with your correct number
-    let attempts = JSON.parse(localStorage.getItem('attempts')) || [];
-    const maxAttempts = 20;
+    const CORRECT_NUMBER = '1234567';
+    const REWARD_ACCOUNT = 'oussama_khouya_10';
 
-    function updateRemainingAttempts() {
-      const remaining = maxAttempts - attempts.length;
-      document.getElementById('remaining-attempts').textContent = remaining;
+    const app = document.getElementById('app');
+
+    let attempts = 0;
+    let remainingAttempts = 20;
+    let previousAttempts = [];
+    let success = false;
+
+    function render() {
+      app.innerHTML = `
+        <div class="card">
+          <div class="card-title">Number Guessing Game</div>
+          <div>Remaining attempts today: ${remainingAttempts}/20</div>
+
+          <input 
+            id="numberInput" 
+            type="text" 
+            placeholder="Enter a 7-digit number" 
+            class="input" 
+            ${success || remainingAttempts <= 0 ? 'disabled' : ''} 
+            maxlength="7"
+          />
+
+          <button 
+            id="submitButton" 
+            class="button" 
+            ${success || remainingAttempts <= 0 ? 'disabled' : ''}
+          >
+            Submit Number
+          </button>
+
+          <div id="message"></div>
+
+          <div class="attempts">
+            <h3>Previous Attempts:</h3>
+            ${previousAttempts.map(attempt => <div class="attempt">${attempt}</div>).join('')}
+          </div>
+        </div>
+      `;
+
+      document.getElementById('submitButton').onclick = handleSubmit;
+      const inputField = document.getElementById('numberInput');
+      inputField.oninput = handleInputChange;
     }
 
-    function checkGuess() {
-      const guess = document.getElementById('guess-input').value;
-      const resultDiv = document.getElementById('result');
-      const previousAttemptsDiv = document.getElementById('previous-attempts');
-      
-      if (guess.length !== 7) {
-        resultDiv.textContent = 'Please enter exactly 7 digits.';
+    function handleInputChange(e) {
+      const inputField = e.target;
+      inputField.value = inputField.value.replace(/[^0-9]/g, '').slice(0, 7);
+    }
+
+    function handleSubmit() {
+      const numberInput = document.getElementById('numberInput');
+      const number = numberInput.value;
+      const messageElement = document.getElementById('message');
+
+      messageElement.innerHTML = '';
+
+      if (number.length !== 7) {
+        messageElement.innerHTML = '<div class="alert">Please enter exactly 7 digits</div>';
         return;
       }
 
-      if (attempts.length >= maxAttempts) {
-        resultDiv.textContent = 'You have reached your daily limit of attempts.';
+      if (remainingAttempts <= 0) {
+        messageElement.innerHTML = '<div class="alert">You have reached your daily limit of attempts</div>';
         return;
       }
 
-      if (guess === CORRECT_NUMBER) {
-        resultDiv.textContent = 'Congratulations! You guessed the correct number!';
+      attempts++;
+      remainingAttempts--;
+      previousAttempts.push(number);
+
+      if (number === CORRECT_NUMBER) {
+        success = true;
+        messageElement.innerHTML = `
+          <div class="alert success">
+            Congratulations, you found the correct number! 
+            <br>
+            Send it to this account to claim your reward: ${REWARD_ACCOUNT}
+          </div>
+        `;
       } else {
-        resultDiv.textContent = 'Incorrect guess. Try again!';
+        messageElement.innerHTML = '<div class="alert">This number is incorrect</div>';
       }
 
-      attempts.push(guess);
-      localStorage.setItem('attempts', JSON.stringify(attempts));
-
-      previousAttemptsDiv.innerHTML = '<h3>Previous Attempts:</h3>';
-      attempts.forEach((attempt) => {
-        previousAttemptsDiv.innerHTML += <div class="attempt">${attempt}</div>;
-      });
-
-      updateRemainingAttempts();
+      render();
     }
+
+    render();
   </script>
 </body>
 </html>
