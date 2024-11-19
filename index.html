@@ -8,60 +8,74 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+  
+  <!-- إضافة سكربت AdMob -->
+  <script async="true" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-8814544587352352",
+      enable_page_level_ads: true
+    });
+  </script>
 </head>
-<body class="bg-green-100 flex items-start justify-center min-h-screen">
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
   <div id="root"></div>
 
   <script type="text/babel">
-    const SECRET_NUMBER = "1234567"; // الرقم السري مباشرة
+    const CORRECT_NUMBER = '1234567'; // Replace with your desired winning number
+    const REWARD_ACCOUNT = 'oussama_khouya_10';
 
     const NumberGuessingGame = () => {
-      const [number, setNumber] = React.useState("");
-      const [attempts, setAttempts] = React.useState(Number(localStorage.getItem("attempts")) || 0);
-      const [previousAttempts, setPreviousAttempts] = React.useState(
-        JSON.parse(localStorage.getItem("previousAttempts")) || []
-      );
-      const [error, setError] = React.useState("");
+      const [number, setNumber] = React.useState('');
+      const [attempts, setAttempts] = React.useState(0);
+      const [previousAttempts, setPreviousAttempts] = React.useState([]);
+      const [error, setError] = React.useState('');
       const [success, setSuccess] = React.useState(false);
+      const [remainingAttempts, setRemainingAttempts] = React.useState(20);
 
       const handleNumberChange = (e) => {
-        const value = e.target.value.replace(/[^0-9]/g, "");
+        const value = e.target.value.replace(/[^0-9]/g, '');
         if (value.length <= 7) {
           setNumber(value);
-          setError("");
+          setError('');
         }
       };
 
       const handleSubmit = () => {
         if (number.length !== 7) {
-          setError("Please enter exactly 7 digits.");
+          setError('Please enter exactly 7 digits');
+          return;
+        }
+
+        if (remainingAttempts <= 0) {
+          setError('You have reached your daily limit of attempts');
           return;
         }
 
         const newAttempts = attempts + 1;
         const newPreviousAttempts = [...previousAttempts, number];
-
         setAttempts(newAttempts);
         setPreviousAttempts(newPreviousAttempts);
+        setRemainingAttempts(20 - newAttempts);
 
-        localStorage.setItem("attempts", newAttempts);
-        localStorage.setItem("previousAttempts", JSON.stringify(newPreviousAttempts));
-
-        if (number === SECRET_NUMBER) {
+        if (number === CORRECT_NUMBER) {
           setSuccess(true);
-          setError("");
+          setError('');
         } else {
-          setError("This number is incorrect.");
+          setError('This number is incorrect');
         }
 
-        setNumber("");
+        setNumber('');
+
+        // عرض إعلان بيني عند الضغط على الزر
+        (adsbygoogle = window.adsbygoogle || []).push({});
       };
 
       return (
         <div className="w-full max-w-md mx-auto bg-white p-6 rounded shadow">
           <h1 className="text-2xl font-bold mb-4">Number Guessing Game</h1>
-          <div className="text-sm text-gray-500 mb-4">Number of attempts: {attempts}</div>
+          <div className="text-sm text-gray-500 mb-4">Remaining attempts today: {remainingAttempts}/20</div>
           <input
             type="text"
             value={number}
@@ -69,18 +83,19 @@
             placeholder="Enter a 7-digit number"
             className="block w-full p-2 border border-gray-300 rounded mb-4 text-center"
             maxLength={7}
-            disabled={success}
+            disabled={success || remainingAttempts <= 0}
           />
           {error && <div className="text-red-500 mb-2">{error}</div>}
           {success && (
             <div className="text-green-500 mb-4">
               Congratulations, you found the correct number!
+              <div>Send it to this account to claim your reward: {REWARD_ACCOUNT}</div>
             </div>
           )}
           <button
             onClick={handleSubmit}
             className="w-full bg-blue-500 text-white py-2 rounded"
-            disabled={success || number.length !== 7}
+            disabled={success || remainingAttempts <= 0 || number.length !== 7}
           >
             Submit Number
           </button>
@@ -98,7 +113,7 @@
       );
     };
 
-    ReactDOM.createRoot(document.getElementById("root")).render(<NumberGuessingGame />);
+    ReactDOM.createRoot(document.getElementById('root')).render(<NumberGuessingGame />);
   </script>
 </body>
 </html>
