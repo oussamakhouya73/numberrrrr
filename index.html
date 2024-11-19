@@ -4,130 +4,76 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Number Guessing Game</title>
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
-  
-  <!-- إضافة سكربت AdMob -->
-  <script async="true" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-  <script>
-    (adsbygoogle = window.adsbygoogle || []).push({
-      google_ad_client: "ca-pub-8814544587352352",
-      enable_page_level_ads: true
-    });
-  </script>
 </head>
-<body class="bg-green-100 flex items-start justify-center min-h-screen">
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
-  <div id="root"></div>
+  <div id="game" class="bg-white p-6 rounded shadow w-full max-w-sm">
+    <h1 class="text-2xl font-bold mb-4">Number Guessing Game</h1>
+    <p class="mb-2 text-gray-600">Guess the 7-digit number!</p>
+    <input 
+      id="userInput" 
+      type="text" 
+      maxlength="7" 
+      placeholder="Enter 7-digit number" 
+      class="block w-full p-2 border rounded mb-4 text-center">
+    <button 
+      onclick="checkNumber()" 
+      class="w-full bg-blue-500 text-white py-2 rounded">Submit</button>
+    <div id="message" class="mt-4 text-center text-gray-700"></div>
+    <div id="attempts" class="mt-2 text-sm text-gray-600"></div>
+  </div>
 
-  <script type="text/babel">
-    // دالة لتشفير الرقم باستخدام Base64
-    function encrypt(text) {
-      return btoa(text);  // تحويل النص إلى Base64
+  <script>
+    // إعداد الرقم المشفر
+    const secretKey = "mySecretKey"; // مفتاح التشفير
+    const correctNumber = "1234567"; // الرقم الصحيح
+    const encryptedNumber = CryptoJS.AES.encrypt(correctNumber, secretKey).toString();
+    localStorage.setItem("encryptedNumber", encryptedNumber);
+
+    // الإعدادات
+    const maxAttempts = 10;
+    let attempts = 0;
+
+    function checkNumber() {
+      const userInput = document.getElementById("userInput").value;
+      const message = document.getElementById("message");
+      const attemptsDisplay = document.getElementById("attempts");
+
+      // التحقق من المدخلات
+      if (userInput.length !== 7) {
+        message.textContent = "Please enter exactly 7 digits.";
+        message.classList.add("text-red-500");
+        return;
+      }
+
+      // زيادة عدد المحاولات
+      attempts++;
+      if (attempts > maxAttempts) {
+        message.textContent = "You have exceeded the maximum attempts!";
+        message.classList.add("text-red-500");
+        return;
+      }
+
+      // فك التشفير والتحقق من الرقم
+      const decryptedNumber = CryptoJS.AES.decrypt(localStorage.getItem("encryptedNumber"), secretKey).toString(CryptoJS.enc.Utf8);
+
+      if (userInput === decryptedNumber) {
+        message.textContent = "Congratulations! You guessed the correct number!";
+        message.classList.remove("text-red-500");
+        message.classList.add("text-green-500");
+      } else {
+        message.textContent = "Incorrect guess. Try again.";
+        message.classList.remove("text-green-500");
+        message.classList.add("text-red-500");
+      }
+
+      // تحديث المحاولات
+      attemptsDisplay.textContent = `Attempts: ${attempts}/${maxAttempts}`;
+      document.getElementById("userInput").value = "";
     }
-
-    // دالة لفك تشفير الرقم باستخدام Base64
-    function decrypt(encodedText) {
-      return atob(encodedText);  // تحويل النص من Base64 إلى النص الأصلي
-    }
-
-    // الرقم الصحيح المطلوب تخمينه
-    const CORRECT_NUMBER = '1234567';
-    const REWARD_ACCOUNT = 'oussama_khouya_10';
-
-    // تخزين الرقم المشفر في localStorage
-    const encryptedNumber = encrypt(CORRECT_NUMBER);
-    localStorage.setItem('correctNumber', encryptedNumber);
-
-    const NumberGuessingGame = () => {
-      const [number, setNumber] = React.useState('');
-      const [attempts, setAttempts] = React.useState(localStorage.getItem('attempts') || 0);
-      const [previousAttempts, setPreviousAttempts] = React.useState(JSON.parse(localStorage.getItem('previousAttempts')) || []);
-      const [error, setError] = React.useState('');
-      const [success, setSuccess] = React.useState(false);
-      
-      const handleNumberChange = (e) => {
-        const value = e.target.value.replace(/[^0-9]/g, '');
-        if (value.length <= 7) {
-          setNumber(value);
-          setError('');
-        }
-      };
-
-      const handleSubmit = () => {
-        if (number.length !== 7) {
-          setError('Please enter exactly 7 digits');
-          return;
-        }
-
-        const newAttempts = attempts + 1;
-        const newPreviousAttempts = [...previousAttempts, number];
-        setAttempts(newAttempts);
-        setPreviousAttempts(newPreviousAttempts);
-
-        localStorage.setItem('attempts', newAttempts);
-        localStorage.setItem('previousAttempts', JSON.stringify(newPreviousAttempts));
-
-        // فك تشفير الرقم المخزن ومقارنته بالرقم المدخل
-        const decryptedNumber = decrypt(localStorage.getItem('correctNumber'));
-
-        if (number === decryptedNumber) {
-          setSuccess(true);
-          setError('');
-        } else {
-          setError('This number is incorrect');
-        }
-
-        setNumber('');
-
-        // عرض إعلان بيني عند الضغط على الزر
-        (adsbygoogle = window.adsbygoogle || []).push({});
-      };
-
-      return (
-        <div className="w-full max-w-md mx-auto bg-white p-6 rounded shadow">
-          <h1 className="text-2xl font-bold mb-4">Number Guessing Game</h1>
-          <div className="text-sm text-gray-500 mb-4">Number of attempts: {attempts}</div>
-          <input
-            type="text"
-            value={number}
-            onChange={handleNumberChange}
-            placeholder="Enter a 7-digit number"
-            className="block w-full p-2 border border-gray-300 rounded mb-4 text-center"
-            maxLength={7}
-            disabled={success}
-          />
-          {error && <div className="text-red-500 mb-2">{error}</div>}
-          {success && (
-            <div className="text-green-500 mb-4">
-              Congratulations, you found the correct number!
-              <div>Send it to this account to claim your reward: {REWARD_ACCOUNT}</div>
-            </div>
-          )}
-          <button
-            onClick={handleSubmit}
-            className="w-full bg-blue-500 text-white py-2 rounded"
-            disabled={success || number.length !== 7}
-          >
-            Submit Number
-          </button>
-          {previousAttempts.length > 0 && (
-            <div className="mt-4">
-              <h3 className="text-sm font-medium mb-2">Previous Attempts:</h3>
-              {previousAttempts.map((attempt, index) => (
-                <div key={index} className="text-sm p-2 bg-gray-50 rounded mb-1">
-                  {attempt}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      );
-    };
-
-    ReactDOM.createRoot(document.getElementById('root')).render(<NumberGuessingGame />);
   </script>
+
 </body>
 </html>
