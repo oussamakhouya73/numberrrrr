@@ -18,9 +18,9 @@
     });
   </script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<body class="bg-gray-100 flex items-start justify-center min-h-screen">
 
-  <div id="root"></div>
+  <div id="root" class="w-full sm:max-w-4xl md:max-w-5xl lg:max-w-6xl p-4"></div>
 
   <script type="text/babel">
     const CORRECT_NUMBER = '1234567'; // Replace with your desired winning number
@@ -68,12 +68,16 @@
 
         setNumber('');
 
-        // عرض إعلان بيني عند الضغط على الزر
-        (adsbygoogle = window.adsbygoogle || []).push({});
+        // عرض الإعلان البيني بعد الضغط على الزر
+        (adsbygoogle = window.adsbygoogle || []).push({
+          google_ad_slot: "7210545293", // وضع المعرف المناسب للإعلان
+          google_ad_width: 320,
+          google_ad_height: 100
+        });
       };
 
       return (
-        <div className="w-full max-w-md mx-auto bg-white p-6 rounded shadow">
+        <div className="w-full bg-white p-6 rounded shadow">
           <h1 className="text-2xl font-bold mb-4">Number Guessing Game</h1>
           <div className="text-sm text-gray-500 mb-4">Remaining attempts today: {remainingAttempts}/20</div>
           <input
