@@ -67,14 +67,22 @@
     <input id="guess-input" class="input" type="text" placeholder="Enter a 7-digit number">
     <button class="btn" onclick="checkGuess()">Submit</button>
     <div id="result"></div>
+    <div id="remaining-attempts"></div>
     <div id="previous-attempts"></div>
   </div>
 
   <script>
     const CORRECT_NUMBER = '1234567';  // Replace with your correct number
     let attempts = JSON.parse(localStorage.getItem('attempts')) || [];
-    const remainingAttempts = 20 - attempts.length;
 
+    // Function to update the number of remaining attempts
+    function updateRemainingAttempts() {
+      const remainingAttempts = 20 - attempts.length;
+      document.getElementById('remaining-attempts').textContent = Remaining attempts today: ${remainingAttempts}/20;
+      return remainingAttempts;
+    }
+
+    // Function to check the guess
     function checkGuess() {
       const guess = document.getElementById('guess-input').value;
       const resultDiv = document.getElementById('result');
@@ -84,6 +92,9 @@
         resultDiv.textContent = 'Please enter exactly 7 digits.';
         return;
       }
+
+      const remainingAttempts = updateRemainingAttempts();
+
       if (remainingAttempts <= 0) {
         resultDiv.textContent = 'You have reached your daily limit of attempts.';
         return;
@@ -95,14 +106,24 @@
         resultDiv.textContent = 'Incorrect guess. Try again!';
       }
 
+      // Save the attempt to the attempts array
       attempts.push(guess);
       localStorage.setItem('attempts', JSON.stringify(attempts));
 
+      // Update the list of previous attempts
       previousAttemptsDiv.innerHTML = '<h3>Previous Attempts:</h3>';
       attempts.forEach((attempt, index) => {
         previousAttemptsDiv.innerHTML += <p>${attempt}</p>;
       });
     }
+
+    // Initialize the remaining attempts and previous attempts when the page loads
+    updateRemainingAttempts();
+    const previousAttemptsDiv = document.getElementById('previous-attempts');
+    previousAttemptsDiv.innerHTML = '<h3>Previous Attempts:</h3>';
+    attempts.forEach((attempt, index) => {
+      previousAttemptsDiv.innerHTML += <p>${attempt}</p>;
+    });
   </script>
 </body>
 </html>
