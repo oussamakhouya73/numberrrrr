@@ -8,82 +8,73 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
-  
-  <!-- إضافة سكربت AdMob -->
-  <script async="true" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-  <script>
-    (adsbygoogle = window.adsbygoogle || []).push({
-      google_ad_client: "ca-pub-8814544587352352",
-      enable_page_level_ads: true
-    });
-  </script>
 </head>
 <body class="bg-green-100 flex items-start justify-center min-h-screen">
 
   <div id="root"></div>
 
   <script type="text/babel">
-    // دالة لتشفير الرقم باستخدام Base64
-    function encrypt(text) {
-      return btoa(text);  // تحويل النص إلى Base64
+    // مكتبة تشفير XOR
+    function encrypt(text, key) {
+      return btoa(
+        text
+          .split("")
+          .map((char, i) => String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(i % key.length)))
+          .join("")
+      );
     }
 
-    // دالة لفك تشفير الرقم باستخدام Base64
-    function decrypt(encodedText) {
-      return atob(encodedText);  // تحويل النص من Base64 إلى النص الأصلي
+    function decrypt(encryptedText, key) {
+      return atob(encryptedText)
+        .split("")
+        .map((char, i) => String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(i % key.length)))
+        .join("");
     }
 
-    // الرقم الصحيح المطلوب تخمينه
-    const CORRECT_NUMBER = '1234567';
-    const REWARD_ACCOUNT = 'oussama_khouya_10';
-
-    // تخزين الرقم المشفر في localStorage
-    const encryptedNumber = encrypt(CORRECT_NUMBER);
-    localStorage.setItem('correctNumber', encryptedNumber);
+    const SECRET_KEY = "MySecretKey123"; // مفتاح التشفير
+    const ENCRYPTED_NUMBER = "MWI9P1kkJyo="; // الرقم مشفر مسبقًا (1234567)
 
     const NumberGuessingGame = () => {
-      const [number, setNumber] = React.useState('');
-      const [attempts, setAttempts] = React.useState(localStorage.getItem('attempts') || 0);
-      const [previousAttempts, setPreviousAttempts] = React.useState(JSON.parse(localStorage.getItem('previousAttempts')) || []);
-      const [error, setError] = React.useState('');
+      const [number, setNumber] = React.useState("");
+      const [attempts, setAttempts] = React.useState(Number(localStorage.getItem("attempts")) || 0);
+      const [previousAttempts, setPreviousAttempts] = React.useState(
+        JSON.parse(localStorage.getItem("previousAttempts")) || []
+      );
+      const [error, setError] = React.useState("");
       const [success, setSuccess] = React.useState(false);
-      
+
       const handleNumberChange = (e) => {
-        const value = e.target.value.replace(/[^0-9]/g, '');
+        const value = e.target.value.replace(/[^0-9]/g, "");
         if (value.length <= 7) {
           setNumber(value);
-          setError('');
+          setError("");
         }
       };
 
       const handleSubmit = () => {
         if (number.length !== 7) {
-          setError('Please enter exactly 7 digits');
+          setError("Please enter exactly 7 digits.");
           return;
         }
 
+        const decryptedNumber = decrypt(ENCRYPTED_NUMBER, SECRET_KEY); // فك التشفير
         const newAttempts = attempts + 1;
         const newPreviousAttempts = [...previousAttempts, number];
+
         setAttempts(newAttempts);
         setPreviousAttempts(newPreviousAttempts);
 
-        localStorage.setItem('attempts', newAttempts);
-        localStorage.setItem('previousAttempts', JSON.stringify(newPreviousAttempts));
-
-        // فك تشفير الرقم المخزن ومقارنته بالرقم المدخل
-        const decryptedNumber = decrypt(localStorage.getItem('correctNumber'));
+        localStorage.setItem("attempts", newAttempts);
+        localStorage.setItem("previousAttempts", JSON.stringify(newPreviousAttempts));
 
         if (number === decryptedNumber) {
           setSuccess(true);
-          setError('');
+          setError("");
         } else {
-          setError('This number is incorrect');
+          setError("This number is incorrect.");
         }
 
-        setNumber('');
-
-        // عرض إعلان بيني عند الضغط على الزر
-        (adsbygoogle = window.adsbygoogle || []).push({});
+        setNumber("");
       };
 
       return (
@@ -103,7 +94,6 @@
           {success && (
             <div className="text-green-500 mb-4">
               Congratulations, you found the correct number!
-              <div>Send it to this account to claim your reward: {REWARD_ACCOUNT}</div>
             </div>
           )}
           <button
@@ -127,7 +117,7 @@
       );
     };
 
-    ReactDOM.createRoot(document.getElementById('root')).render(<NumberGuessingGame />);
+    ReactDOM.createRoot(document.getElementById("root")).render(<NumberGuessingGame />);
   </script>
 </body>
 </html>
