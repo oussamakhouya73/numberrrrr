@@ -16,7 +16,7 @@
   <script type="text/babel">
     // الرقم الأصلي
     const ORIGINAL_NUMBER = "3573284";
-    
+
     // المفتاح المستخدم في التشفير
     const XOR_KEY = "secretKey"; 
 
@@ -38,9 +38,9 @@
       return result;
     };
 
-    // تشفير الرقم باستخدام XOR والمفتاح المحدد
+    // تشفير الرقم باستخدام XOR
     const ENCRYPTED_NUMBER = xorEncrypt(ORIGINAL_NUMBER, XOR_KEY);
-    console.log("Encrypted Number:", ENCRYPTED_NUMBER);  // طباعة الرقم المشفر في الكونسول
+    console.log("Encrypted Number:", ENCRYPTED_NUMBER);  // طباعة الرقم المشفر
 
     const NumberGuessingGame = () => {
       const [number, setNumber] = React.useState('');
@@ -64,8 +64,7 @@
         }
 
         const decryptedNumber = xorDecrypt(ENCRYPTED_NUMBER, XOR_KEY);
-
-        console.log("Decrypted Number:", decryptedNumber);  // طباعة الرقم المفكوك في الكونسول
+        console.log("Decrypted Number:", decryptedNumber);  // طباعة الرقم المفكوك
 
         setAttempts(attempts + 1);
         setPreviousAttempts([...previousAttempts, number]);
@@ -84,20 +83,22 @@
         <div className="w-full max-w-md mx-auto bg-white p-6 rounded shadow">
           <h1 className="text-2xl font-bold mb-4">Number Guessing Game</h1>
           <div className="text-sm text-gray-500 mb-4">Attempts: {attempts}</div>
-          <input
-            type="text"
-            value={number}
-            onChange={handleNumberChange}
-            placeholder="Enter a 7-digit number"
-            className="block w-full p-2 border border-gray-300 rounded mb-4 text-center"
-            maxLength={7}
-            disabled={success}
-          />
-          {error && <div className="text-red-500 mb-2">{error}</div>}
+          {!success && (
+            <>
+              <input
+                type="text"
+                value={number}
+                onChange={handleNumberChange}
+                placeholder="Enter a 7-digit number"
+                className="block w-full p-2 border border-gray-300 rounded mb-4 text-center"
+                maxLength={7}
+              />
+              {error && <div className="text-red-500 mb-2">{error}</div>}
+            </>
+          )}
           {success && (
             <div className="text-green-500 mb-4">
               Congratulations, you found the correct number!
-              <div>Send it to this account to claim your reward: {REWARD_ACCOUNT}</div>
             </div>
           )}
           <button
