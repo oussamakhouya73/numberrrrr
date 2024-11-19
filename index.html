@@ -23,8 +23,23 @@
   <div id="root"></div>
 
   <script type="text/babel">
-    const CORRECT_NUMBER = '1234567'; // الرقم الصحيح المطلوب تخمينه
+    // دالة لتشفير الرقم باستخدام Base64
+    function encrypt(text) {
+      return btoa(text);  // تحويل النص إلى Base64
+    }
+
+    // دالة لفك تشفير الرقم باستخدام Base64
+    function decrypt(encodedText) {
+      return atob(encodedText);  // تحويل النص من Base64 إلى النص الأصلي
+    }
+
+    // الرقم الصحيح المطلوب تخمينه
+    const CORRECT_NUMBER = '1234567';
     const REWARD_ACCOUNT = 'oussama_khouya_10';
+
+    // تخزين الرقم المشفر في localStorage
+    const encryptedNumber = encrypt(CORRECT_NUMBER);
+    localStorage.setItem('correctNumber', encryptedNumber);
 
     const NumberGuessingGame = () => {
       const [number, setNumber] = React.useState('');
@@ -32,8 +47,7 @@
       const [previousAttempts, setPreviousAttempts] = React.useState(JSON.parse(localStorage.getItem('previousAttempts')) || []);
       const [error, setError] = React.useState('');
       const [success, setSuccess] = React.useState(false);
-      const [remainingAttempts, setRemainingAttempts] = React.useState(20 - attempts);
-
+      
       const handleNumberChange = (e) => {
         const value = e.target.value.replace(/[^0-9]/g, '');
         if (value.length <= 7) {
@@ -48,21 +62,18 @@
           return;
         }
 
-        if (remainingAttempts <= 0) {
-          setError('You have reached your daily limit of attempts');
-          return;
-        }
-
         const newAttempts = attempts + 1;
         const newPreviousAttempts = [...previousAttempts, number];
         setAttempts(newAttempts);
         setPreviousAttempts(newPreviousAttempts);
-        setRemainingAttempts(20 - newAttempts);
 
         localStorage.setItem('attempts', newAttempts);
         localStorage.setItem('previousAttempts', JSON.stringify(newPreviousAttempts));
 
-        if (number === CORRECT_NUMBER) {
+        // فك تشفير الرقم المخزن ومقارنته بالرقم المدخل
+        const decryptedNumber = decrypt(localStorage.getItem('correctNumber'));
+
+        if (number === decryptedNumber) {
           setSuccess(true);
           setError('');
         } else {
@@ -86,7 +97,7 @@
             placeholder="Enter a 7-digit number"
             className="block w-full p-2 border border-gray-300 rounded mb-4 text-center"
             maxLength={7}
-            disabled={success || remainingAttempts <= 0}
+            disabled={success}
           />
           {error && <div className="text-red-500 mb-2">{error}</div>}
           {success && (
@@ -98,7 +109,7 @@
           <button
             onClick={handleSubmit}
             className="w-full bg-blue-500 text-white py-2 rounded"
-            disabled={success || remainingAttempts <= 0 || number.length !== 7}
+            disabled={success || number.length !== 7}
           >
             Submit Number
           </button>
