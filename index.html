@@ -8,23 +8,24 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
-  
-  <!-- إضافة سكربت AdMob -->
-  <script async="true" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-  <script>
-    (adsbygoogle = window.adsbygoogle || []).push({
-      google_ad_client: "ca-pub-8814544587352352",
-      enable_page_level_ads: true
-    });
-  </script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
   <div id="root"></div>
 
   <script type="text/babel">
-    const CORRECT_NUMBER = '1234567'; // Replace with your desired winning number
+    // الرقم المشفر مسبقًا (تشفير مسبق يتم خارج الكود)
+    const ENCRYPTED_NUMBER = "J@CFAEE"; // هذا الرقم تم تشفيره مسبقًا باستخدام XOR مع مفتاح معين
+    const XOR_KEY = "secretKey"; // المفتاح المستخدم للتشفير وفك التشفير
     const REWARD_ACCOUNT = 'oussama_khouya_10';
+
+    // دالة فك التشفير باستخدام XOR
+    const xorDecrypt = (input, key) => {
+      return input
+        .split("")
+        .map((char, index) => String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(index % key.length)))
+        .join("");
+    };
 
     const NumberGuessingGame = () => {
       const [number, setNumber] = React.useState('');
@@ -53,13 +54,15 @@
           return;
         }
 
+        const decryptedNumber = xorDecrypt(ENCRYPTED_NUMBER, XOR_KEY);
+
         const newAttempts = attempts + 1;
         const newPreviousAttempts = [...previousAttempts, number];
         setAttempts(newAttempts);
         setPreviousAttempts(newPreviousAttempts);
         setRemainingAttempts(20 - newAttempts);
 
-        if (number === CORRECT_NUMBER) {
+        if (number === decryptedNumber) {
           setSuccess(true);
           setError('');
         } else {
@@ -67,9 +70,6 @@
         }
 
         setNumber('');
-
-        // عرض إعلان بيني عند الضغط على الزر
-        (adsbygoogle = window.adsbygoogle || []).push({});
       };
 
       return (
