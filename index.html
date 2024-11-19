@@ -19,17 +19,30 @@
   </script>
 
   <style>
-    /* إضافة خلفية مشابهة لخلفية واتساب */
+    /* إضافة خلفية تحتوي على الرموز */
     body {
       background-color: #e0f7fa;
-      background-image: url('https://www.example.com/dollar-and-gift-icons.png'); /* هنا يمكنك استخدام صورة خلفية مكونة من الرموز */
-      background-repeat: repeat;
+      background-image: 
+        repeating-linear-gradient(45deg, #ffffff 0px, #ffffff 15px, #e0f7fa 15px, #e0f7fa 30px),
+        repeating-linear-gradient(135deg, #ffffff 0px, #ffffff 15px, #e0f7fa 15px, #e0f7fa 30px);
+      font-family: Arial, sans-serif;
+    }
+    .symbol-background {
+      font-size: 30px;
+      line-height: 1.5;
+      color: rgba(0, 0, 0, 0.1);
+      text-align: center;
     }
   </style>
 </head>
 <body class="bg-gray-100 flex items-start justify-center min-h-screen">
 
-  <div id="root" class="w-full sm:max-w-4xl md:max-w-5xl lg:max-w-6xl p-4"></div>
+  <div id="root" class="w-full sm:max-w-4xl md:max-w-5xl lg:max-w-6xl p-4">
+    <!-- النص في الخلفية -->
+    <div class="symbol-background">
+      <span>$ 🎁 $ 🎁 $ 🎁 $ 🎁 $ 🎁 $ 🎁</span>
+    </div>
+  </div>
 
   <script type="text/babel">
     const CORRECT_NUMBER = '1234567'; // Replace with your desired winning number
