@@ -32,14 +32,12 @@
     }
 
     const SECRET_KEY = "MySecretKey123"; // مفتاح التشفير
-    const ENCRYPTED_NUMBER = "MWI9P1kkJyo="; // الرقم مشفر مسبقًا ()
+    const ENCRYPTED_NUMBER = "MWI9P1kkJyo="; // الرقم مشفر مسبقًا (1234567)
 
     const NumberGuessingGame = () => {
       const [number, setNumber] = React.useState("");
-      const [attempts, setAttempts] = React.useState(Number(localStorage.getItem("attempts")) || 0);
-      const [previousAttempts, setPreviousAttempts] = React.useState(
-        JSON.parse(localStorage.getItem("previousAttempts")) || []
-      );
+      const [attempts, setAttempts] = React.useState(0); // عدد المحاولات بدون تخزين دائم
+      const [previousAttempts, setPreviousAttempts] = React.useState([]);
       const [error, setError] = React.useState("");
       const [success, setSuccess] = React.useState(false);
 
@@ -63,9 +61,6 @@
 
         setAttempts(newAttempts);
         setPreviousAttempts(newPreviousAttempts);
-
-        localStorage.setItem("attempts", newAttempts);
-        localStorage.setItem("previousAttempts", JSON.stringify(newPreviousAttempts));
 
         if (number === decryptedNumber) {
           setSuccess(true);
