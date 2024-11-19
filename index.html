@@ -8,24 +8,38 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+  
+  <!-- إضافة سكربت AdMob -->
+  <script async="true" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-8814544587352352",
+      enable_page_level_ads: true
+    });
+  </script>
 
   <style>
-    /* إضافة خلفية بسيطة مشابهة لخلفية واتساب */
+    /* تدرج خلفية مشابه لتدرج تطبيق واتساب */
     body {
-      background-color: #e5ddd5; /* لون الخلفية يشبه لون واتساب */
-      background-image: linear-gradient(to bottom right, #25D366, #128C7E); /* تدرج لوني بين أخضر فاتح وغامق */
+      background-color: #f4f7fa;
+      background-image: 
+        linear-gradient(120deg, #25D366, #128C7E); /* تدرج لوني بين الأخضر والأزرق */
       font-family: Arial, sans-serif;
-      background-size: cover;
-      background-attachment: fixed; /* جعل الخلفية ثابتة عند التمرير */
+    }
+    .symbol-background {
+      font-size: 30px;
+      line-height: 1.5;
+      color: rgba(0, 0, 0, 0.1);
+      text-align: center;
     }
   </style>
 </head>
-<body class="flex items-center justify-center min-h-screen">
+<body class="bg-gray-100 flex items-start justify-center min-h-screen">
 
-  <div id="root" class="w-full sm:max-w-4xl md:max-w-5xl lg:max-w-6xl p-4 mt-0"> <!-- تم تعديل المسافة العلوية إلى mt-0 -->
-    <div class="w-full bg-white p-6 rounded shadow">
-      <h1 class="text-2xl font-bold mb-4">Number Guessing Game</h1>
-      <!-- باقي عناصر اللعبة هنا -->
+  <div id="root" class="w-full sm:max-w-4xl md:max-w-5xl lg:max-w-6xl p-4">
+    <!-- حذف النص الرمزي في الخلفية -->
+    <div class="symbol-background">
+      <!-- النص الرمزي تم حذفه هنا -->
     </div>
   </div>
 
@@ -74,6 +88,13 @@
         }
 
         setNumber('');
+
+        // عرض الإعلان البيني بعد الضغط على الزر
+        (adsbygoogle = window.adsbygoogle || []).push({
+          google_ad_slot: "7210545293", // وضع المعرف المناسب للإعلان
+          google_ad_width: 320,
+          google_ad_height: 100
+        });
       };
 
       return (
