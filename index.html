@@ -14,16 +14,33 @@
   <div id="root"></div>
 
   <script type="text/babel">
-    const ENCRYPTED_NUMBER = "I@FDEFF"; // الرقم المشفر الجديد
-    const XOR_KEY = "secretKey"; // مفتاح التشفير
-    const REWARD_ACCOUNT = 'oussama_khouya_10';
+    // الرقم الأصلي
+    const ORIGINAL_NUMBER = "3573284";
+    
+    // المفتاح المستخدم في التشفير
+    const XOR_KEY = "secretKey"; 
 
-    const xorDecrypt = (input, key) => {
-      return input
-        .split("")
-        .map((char, index) => String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(index % key.length)))
-        .join("");
+    // دالة التشفير باستخدام XOR
+    const xorEncrypt = (input, key) => {
+      let result = '';
+      for (let i = 0; i < input.length; i++) {
+        result += String.fromCharCode(input.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+      }
+      return result;
     };
+
+    // دالة فك التشفير باستخدام XOR
+    const xorDecrypt = (input, key) => {
+      let result = '';
+      for (let i = 0; i < input.length; i++) {
+        result += String.fromCharCode(input.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+      }
+      return result;
+    };
+
+    // تشفير الرقم باستخدام XOR والمفتاح المحدد
+    const ENCRYPTED_NUMBER = xorEncrypt(ORIGINAL_NUMBER, XOR_KEY);
+    console.log("Encrypted Number:", ENCRYPTED_NUMBER);  // طباعة الرقم المشفر في الكونسول
 
     const NumberGuessingGame = () => {
       const [number, setNumber] = React.useState('');
@@ -47,6 +64,8 @@
         }
 
         const decryptedNumber = xorDecrypt(ENCRYPTED_NUMBER, XOR_KEY);
+
+        console.log("Decrypted Number:", decryptedNumber);  // طباعة الرقم المفكوك في الكونسول
 
         setAttempts(attempts + 1);
         setPreviousAttempts([...previousAttempts, number]);
