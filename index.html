@@ -8,41 +8,24 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
-  
-  <!-- إضافة سكربت AdMob -->
-  <script async="true" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-  <script>
-    (adsbygoogle = window.adsbygoogle || []).push({
-      google_ad_client: "ca-pub-8814544587352352",
-      enable_page_level_ads: true
-    });
-  </script>
 
   <style>
-    /* إضافة خلفية تحتوي على الرموز دولارات وأرقام */
+    /* إضافة خلفية بسيطة مشابهة لخلفية واتساب */
     body {
-      background-color: #f4f7fa;
-      background-image: 
-        repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.1) 0px, rgba(0, 0, 0, 0.1) 20px, #f4f7fa 20px, #f4f7fa 40px),
-        repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.1) 0px, rgba(0, 0, 0, 0.1) 20px, #f4f7fa 20px, #f4f7fa 40px),
-        url('https://via.placeholder.com/1500x1500/cccccc/000000?text=%24%20%24%20%24%20%24%20%24%20%24%20%24%20%24%20%24%20%24%20%24%20%24%20%24%20%24%20%24%20%24%20%24%20%24%20%24%20%24');
-      background-size: 150px 150px;
+      background-color: #e5ddd5; /* لون الخلفية يشبه لون واتساب */
+      background-image: linear-gradient(to bottom right, #25D366, #128C7E); /* تدرج لوني بين أخضر فاتح وغامق */
       font-family: Arial, sans-serif;
-    }
-    .symbol-background {
-      font-size: 30px;
-      line-height: 1.5;
-      color: rgba(0, 0, 0, 0.1);
-      text-align: center;
+      background-size: cover;
+      background-attachment: fixed; /* جعل الخلفية ثابتة عند التمرير */
     }
   </style>
 </head>
-<body class="bg-gray-100 flex items-start justify-center min-h-screen">
+<body class="flex items-center justify-center min-h-screen">
 
   <div id="root" class="w-full sm:max-w-4xl md:max-w-5xl lg:max-w-6xl p-4">
-    <!-- النص في الخلفية -->
-    <div class="symbol-background">
-      <span>$ 🎁 $ 🎁 $ 🎁 $ 🎁 $ 🎁 $ 🎁</span>
+    <div class="w-full bg-white p-6 rounded shadow">
+      <h1 class="text-2xl font-bold mb-4">Number Guessing Game</h1>
+      <!-- باقي عناصر اللعبة هنا -->
     </div>
   </div>
 
@@ -91,13 +74,6 @@
         }
 
         setNumber('');
-
-        // عرض الإعلان البيني بعد الضغط على الزر
-        (adsbygoogle = window.adsbygoogle || []).push({
-          google_ad_slot: "7210545293", // وضع المعرف المناسب للإعلان
-          google_ad_width: 320,
-          google_ad_height: 100
-        });
       };
 
       return (
