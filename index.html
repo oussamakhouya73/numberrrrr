@@ -14,30 +14,14 @@
   <div id="root"></div>
 
   <script type="text/babel">
-    // مكتبة تشفير XOR
-    function encrypt(text, key) {
-      return btoa(
-        text
-          .split("")
-          .map((char, i) => String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(i % key.length)))
-          .join("")
-      );
-    }
-
-    function decrypt(encryptedText, key) {
-      return atob(encryptedText)
-        .split("")
-        .map((char, i) => String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(i % key.length)))
-        .join("");
-    }
-
-    const SECRET_KEY = "MySecretKey123"; // مفتاح التشفير
-    const ENCRYPTED_NUMBER = "MWI9P1kkJyo="; // الرقم مشفر مسبقًا (1234567)
+    const SECRET_NUMBER = "1234567"; // الرقم السري مباشرة
 
     const NumberGuessingGame = () => {
       const [number, setNumber] = React.useState("");
-      const [attempts, setAttempts] = React.useState(0); // عدد المحاولات بدون تخزين دائم
-      const [previousAttempts, setPreviousAttempts] = React.useState([]);
+      const [attempts, setAttempts] = React.useState(Number(localStorage.getItem("attempts")) || 0);
+      const [previousAttempts, setPreviousAttempts] = React.useState(
+        JSON.parse(localStorage.getItem("previousAttempts")) || []
+      );
       const [error, setError] = React.useState("");
       const [success, setSuccess] = React.useState(false);
 
@@ -55,14 +39,16 @@
           return;
         }
 
-        const decryptedNumber = decrypt(ENCRYPTED_NUMBER, SECRET_KEY); // فك التشفير
         const newAttempts = attempts + 1;
         const newPreviousAttempts = [...previousAttempts, number];
 
         setAttempts(newAttempts);
         setPreviousAttempts(newPreviousAttempts);
 
-        if (number === decryptedNumber) {
+        localStorage.setItem("attempts", newAttempts);
+        localStorage.setItem("previousAttempts", JSON.stringify(newPreviousAttempts));
+
+        if (number === SECRET_NUMBER) {
           setSuccess(true);
           setError("");
         } else {
