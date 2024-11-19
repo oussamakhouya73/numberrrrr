@@ -9,54 +9,62 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
 
-  <!-- AdMob Script -->
-  <script async="true" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-  <script>
-    (adsbygoogle = window.adsbygoogle || []).push({
-      google_ad_client: "ca-pub-8814544587352352",
-      enable_page_level_ads: true
-    });
-  </script>
-
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f7fafc;
+      background-color: #f4f7fb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
     }
     .container {
       width: 100%;
       max-width: 400px;
-      margin: 0 auto;
+      background-color: #fff;
       padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
     .input {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       margin: 10px 0;
-      border-radius: 5px;
+      border-radius: 6px;
       border: 1px solid #ccc;
+      font-size: 16px;
     }
     .btn {
       width: 100%;
-      padding: 10px;
-      background-color: #3182ce;
+      padding: 12px;
+      background-color: #4a5568;
       color: white;
-      border-radius: 5px;
+      border-radius: 6px;
       cursor: pointer;
       border: none;
+      font-size: 16px;
     }
-    @media (max-width: 600px) {
-      .container {
-        padding: 10px;
-      }
-      .input {
-        padding: 8px;
-      }
-      .btn {
-        padding: 8px;
-      }
+    .remaining-attempts {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #718096;
+    }
+    .attempts-list {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #4a5568;
+    }
+    .attempt {
+      padding: 8px;
+      background-color: #edf2f7;
+      margin-bottom: 8px;
+      border-radius: 4px;
+    }
+    .result {
+      font-size: 18px;
+      color: #2d3748;
+      margin-top: 10px;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -64,25 +72,27 @@
 <body>
   <div class="container">
     <h1 class="text-center text-xl font-bold">Number Guessing Game</h1>
-    <input id="guess-input" class="input" type="text" placeholder="Enter a 7-digit number" maxlength="7">
-    <button class="btn" onclick="checkGuess()">Submit</button>
-    <div id="result"></div>
-    <div id="remaining-attempts"></div>
-    <div id="previous-attempts"></div>
+    <div class="remaining-attempts">
+      Remaining attempts today: <span id="remaining-attempts">20</span>/20
+    </div>
+    <input id="guess-input" class="input" type="text" placeholder="Enter a 7-digit number">
+    <button class="btn" onclick="checkGuess()">Submit Number</button>
+    <div class="result" id="result"></div>
+    <div class="attempts-list" id="previous-attempts">
+      <h3>Previous Attempts:</h3>
+    </div>
   </div>
 
   <script>
     const CORRECT_NUMBER = '1234567';  // Replace with your correct number
     let attempts = JSON.parse(localStorage.getItem('attempts')) || [];
+    const maxAttempts = 20;
 
-    // Function to update the number of remaining attempts
     function updateRemainingAttempts() {
-      const remainingAttempts = 20 - attempts.length;
-      document.getElementById('remaining-attempts').textContent = Remaining attempts today: ${remainingAttempts}/20;
-      return remainingAttempts;
+      const remaining = maxAttempts - attempts.length;
+      document.getElementById('remaining-attempts').textContent = remaining;
     }
 
-    // Function to check the guess
     function checkGuess() {
       const guess = document.getElementById('guess-input').value;
       const resultDiv = document.getElementById('result');
@@ -93,9 +103,7 @@
         return;
       }
 
-      const remainingAttempts = updateRemainingAttempts();
-
-      if (remainingAttempts <= 0) {
+      if (attempts.length >= maxAttempts) {
         resultDiv.textContent = 'You have reached your daily limit of attempts.';
         return;
       }
@@ -106,24 +114,16 @@
         resultDiv.textContent = 'Incorrect guess. Try again!';
       }
 
-      // Save the attempt to the attempts array
       attempts.push(guess);
       localStorage.setItem('attempts', JSON.stringify(attempts));
 
-      // Update the list of previous attempts
       previousAttemptsDiv.innerHTML = '<h3>Previous Attempts:</h3>';
-      attempts.forEach((attempt, index) => {
-        previousAttemptsDiv.innerHTML += <p>${attempt}</p>;
+      attempts.forEach((attempt) => {
+        previousAttemptsDiv.innerHTML += <div class="attempt">${attempt}</div>;
       });
-    }
 
-    // Initialize the remaining attempts and previous attempts when the page loads
-    updateRemainingAttempts();
-    const previousAttemptsDiv = document.getElementById('previous-attempts');
-    previousAttemptsDiv.innerHTML = '<h3>Previous Attempts:</h3>';
-    attempts.forEach((attempt, index) => {
-      previousAttemptsDiv.innerHTML += <p>${attempt}</p>;
-    });
+      updateRemainingAttempts();
+    }
   </script>
 </body>
 </html>
