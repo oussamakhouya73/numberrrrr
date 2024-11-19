@@ -76,7 +76,7 @@
         }
       };
 
-      const handleSubmit = async () => {
+      const handleSubmit = () => {
         if (number.length !== 7) {
           setError('Please enter exactly 7 digits');
           return;
@@ -93,13 +93,26 @@
         setPreviousAttempts(newPreviousAttempts);
         setRemainingAttempts(20 - newAttempts);
 
-        const hash = await getHash(number); // Get hash asynchronously
-        if (hash === correctNumberHash) {
-          setSuccess(true);
-          setError('');
-        } else {
-          setError('This number is incorrect');
-        }
+        // دالة للحصول على التجزئة (hash) باستخدام SHA256
+        const getHash = (input) => {
+          const crypto = window.crypto || window.msCrypto; // for IE11
+          const encoder = new TextEncoder();
+          const data = encoder.encode(input);
+          return crypto.subtle.digest('SHA-256', data).then((hashBuffer) => {
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+          });
+        };
+
+        getHash(number).then((hash) => {
+          if (hash === correctNumberHash) {
+            setSuccess(true);
+            setError('');
+          } else {
+            setError('This number is incorrect');
+          }
+        });
 
         setNumber('');
         
@@ -114,17 +127,6 @@
           google_ad_width: 320,
           google_ad_height: 100
         });
-      };
-
-      // دالة للحصول على التجزئة (hash) باستخدام SHA256
-      const getHash = async (input) => {
-        const crypto = window.crypto || window.msCrypto; // for IE11
-        const encoder = new TextEncoder();
-        const data = encoder.encode(input);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
-        return hashHex;
       };
 
       return (
