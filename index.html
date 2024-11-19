@@ -8,18 +8,28 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+  
+  <!-- إضافة سكربت AdMob -->
+  <script async="true" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-8814544587352352",
+      enable_page_level_ads: true
+    });
+  </script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
   <div id="root"></div>
 
   <script type="text/babel">
-    // تخزين الهاش للرقم الصحيح
-    const CORRECT_HASH = 'your-hashed-number'; // يجب أن يكون الهاش للرقم الصحيح، والذي يتم حسابه باستخدام SHA-256
+    const CORRECT_NUMBER = '1234567'; // الرقم الصحيح المدخل
+    const REWARD_ACCOUNT = 'oussama_khouya_10';
 
     const NumberGuessingGame = () => {
       const [number, setNumber] = React.useState('');
       const [attempts, setAttempts] = React.useState(0);
+      const [previousAttempts, setPreviousAttempts] = React.useState([]);
       const [error, setError] = React.useState('');
       const [success, setSuccess] = React.useState(false);
       const [remainingAttempts, setRemainingAttempts] = React.useState(20);
@@ -32,7 +42,7 @@
         }
       };
 
-      // دالة لإنشاء هاش SHA-256 للرقم
+      // دالة لتشفير الرقم باستخدام SHA-256
       const createHash = async (input) => {
         const encoder = new TextEncoder();
         const data = encoder.encode(input);
@@ -53,26 +63,36 @@
           return;
         }
 
-        // إنشاء الهاش للرقم المدخل
+        const newAttempts = attempts + 1;
+        const newPreviousAttempts = [...previousAttempts, number];
+        setAttempts(newAttempts);
+        setPreviousAttempts(newPreviousAttempts);
+        setRemainingAttempts(20 - newAttempts);
+
+        // إنشاء هاش للرقم المدخل
         const enteredHash = await createHash(number);
 
-        // مقارنة الهاش المدخل مع الهاش المخزن
-        if (enteredHash === CORRECT_HASH) {
+        // إنشاء هاش للرقم الصحيح "1234567"
+        const correctHash = await createHash(CORRECT_NUMBER);
+
+        // مقارنة الهاش المدخل مع الهاش الصحيح
+        if (enteredHash === correctHash) {
           setSuccess(true);
           setError('');
         } else {
           setError('This number is incorrect');
         }
 
-        setAttempts(attempts + 1);
-        setRemainingAttempts(20 - (attempts + 1));
         setNumber('');
+
+        // عرض إعلان بيني عند الضغط على الزر
+        (adsbygoogle = window.adsbygoogle || []).push({});
       };
 
       return (
         <div className="w-full max-w-md mx-auto bg-white p-6 rounded shadow">
-          <h1 className="text-2xl font-bold mb-4">Number Guessing Game</h1>
           <div className="text-sm text-gray-500 mb-4">Remaining attempts today: {remainingAttempts}/20</div>
+          <h1 className="text-2xl font-bold mb-4">Number Guessing Game</h1>
           <input
             type="text"
             value={number}
@@ -86,6 +106,7 @@
           {success && (
             <div className="text-green-500 mb-4">
               Congratulations, you found the correct number!
+              <div>Send it to this account to claim your reward: {REWARD_ACCOUNT}</div>
             </div>
           )}
           <button
@@ -95,6 +116,16 @@
           >
             Submit Number
           </button>
+          {previousAttempts.length > 0 && (
+            <div className="mt-4">
+              <h3 className="text-sm font-medium mb-2">Previous Attempts:</h3>
+              {previousAttempts.map((attempt, index) => (
+                <div key={index} className="text-sm p-2 bg-gray-50 rounded mb-1">
+                  {attempt}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       );
     };
