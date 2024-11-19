@@ -18,21 +18,21 @@
     });
   </script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<body class="bg-green-100 flex items-start justify-center min-h-screen">
 
   <div id="root"></div>
 
   <script type="text/babel">
-    const CORRECT_NUMBER = '1234567'; // الرقم الصحيح المدخل
+    const CORRECT_NUMBER = '1234567'; // الرقم الصحيح المطلوب تخمينه
     const REWARD_ACCOUNT = 'oussama_khouya_10';
 
     const NumberGuessingGame = () => {
       const [number, setNumber] = React.useState('');
-      const [attempts, setAttempts] = React.useState(0);
-      const [previousAttempts, setPreviousAttempts] = React.useState([]);
+      const [attempts, setAttempts] = React.useState(localStorage.getItem('attempts') || 0);
+      const [previousAttempts, setPreviousAttempts] = React.useState(JSON.parse(localStorage.getItem('previousAttempts')) || []);
       const [error, setError] = React.useState('');
       const [success, setSuccess] = React.useState(false);
-      const [remainingAttempts, setRemainingAttempts] = React.useState(20);
+      const [remainingAttempts, setRemainingAttempts] = React.useState(20 - attempts);
 
       const handleNumberChange = (e) => {
         const value = e.target.value.replace(/[^0-9]/g, '');
@@ -42,17 +42,7 @@
         }
       };
 
-      // دالة لتشفير الرقم باستخدام SHA-256
-      const createHash = async (input) => {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(input);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
-        return hashHex;
-      };
-
-      const handleSubmit = async () => {
+      const handleSubmit = () => {
         if (number.length !== 7) {
           setError('Please enter exactly 7 digits');
           return;
@@ -69,14 +59,10 @@
         setPreviousAttempts(newPreviousAttempts);
         setRemainingAttempts(20 - newAttempts);
 
-        // إنشاء هاش للرقم المدخل
-        const enteredHash = await createHash(number);
+        localStorage.setItem('attempts', newAttempts);
+        localStorage.setItem('previousAttempts', JSON.stringify(newPreviousAttempts));
 
-        // إنشاء هاش للرقم الصحيح "1234567"
-        const correctHash = await createHash(CORRECT_NUMBER);
-
-        // مقارنة الهاش المدخل مع الهاش الصحيح
-        if (enteredHash === correctHash) {
+        if (number === CORRECT_NUMBER) {
           setSuccess(true);
           setError('');
         } else {
@@ -91,8 +77,8 @@
 
       return (
         <div className="w-full max-w-md mx-auto bg-white p-6 rounded shadow">
-          <div className="text-sm text-gray-500 mb-4">Remaining attempts today: {remainingAttempts}/20</div>
           <h1 className="text-2xl font-bold mb-4">Number Guessing Game</h1>
+          <div className="text-sm text-gray-500 mb-4">Number of attempts: {attempts}</div>
           <input
             type="text"
             value={number}
