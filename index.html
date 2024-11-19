@@ -14,31 +14,16 @@
   <div id="root"></div>
 
   <script type="text/babel">
-    // الرقم الأصلي
-    const ORIGINAL_NUMBER = "3573284";
-    
-    // المفتاح المستخدم في التشفير
-    const XOR_KEY = "secretKey"; 
+    const ENCRYPTED_NUMBER = "I@FDEFF"; // الرقم المشفر الجديد
+    const XOR_KEY = "secretKey"; // مفتاح التشفير
+    const REWARD_ACCOUNT = 'oussama_khouya_10';
 
-    // دالة التشفير باستخدام XOR
-    const xorEncrypt = (input, key) => {
-      return input
-        .split("")
-        .map((char, index) => String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(index % key.length)))
-        .join("");
-    };
-
-    // دالة فك التشفير باستخدام XOR
     const xorDecrypt = (input, key) => {
       return input
         .split("")
         .map((char, index) => String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(index % key.length)))
         .join("");
     };
-
-    // تشفير الرقم باستخدام XOR والمفتاح المحدد
-    const ENCRYPTED_NUMBER = xorEncrypt(ORIGINAL_NUMBER, XOR_KEY);
-    console.log("Encrypted Number:", ENCRYPTED_NUMBER);  // طباعة الرقم المشفر في الكونسول
 
     const NumberGuessingGame = () => {
       const [number, setNumber] = React.useState('');
