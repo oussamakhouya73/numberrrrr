@@ -9,7 +9,6 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
   
-  <!-- إضافة سكربت AdMob -->
   <script async="true" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
   <script>
     (adsbygoogle = window.adsbygoogle || []).push({
@@ -19,11 +18,9 @@
   </script>
 
   <style>
-    /* تدرج خلفية مشابه لتدرج تطبيق واتساب */
     body {
       background-color: #f4f7fa;
-      background-image: 
-        linear-gradient(120deg, #25D366, #128C7E); /* تدرج لوني بين الأخضر والأزرق */
+      background-image: linear-gradient(120deg, #25D366, #128C7E);
       font-family: Arial, sans-serif;
     }
     .symbol-background {
@@ -37,14 +34,12 @@
 <body class="bg-gray-100 flex items-start justify-center min-h-screen">
 
   <div id="root" class="w-full sm:max-w-4xl md:max-w-5xl lg:max-w-6xl p-4">
-    <!-- حذف النص الرمزي في الخلفية -->
     <div class="symbol-background">
-      <!-- النص الرمزي تم حذفه هنا -->
     </div>
   </div>
 
   <script type="text/babel">
-    const CORRECT_NUMBER = '1234567'; // Replace with your desired winning number
+    const correctNumberHash = "6a2f6ab6bb24dbffbde18d601453b4bdb938c8ef1d1e60da05e01c4f02c6e7e8"; // SHA256 Hash of '1234567'
     const REWARD_ACCOUNT = 'oussama_khouya_10';
 
     const NumberGuessingGame = () => {
@@ -54,6 +49,24 @@
       const [error, setError] = React.useState('');
       const [success, setSuccess] = React.useState(false);
       const [remainingAttempts, setRemainingAttempts] = React.useState(20);
+
+      React.useEffect(() => {
+        const storedAttempts = localStorage.getItem('attempts');
+        const storedPreviousAttempts = JSON.parse(localStorage.getItem('previousAttempts')) || [];
+        const storedRemainingAttempts = localStorage.getItem('remainingAttempts') || 20;
+        const storedLastDate = localStorage.getItem('lastDate') || new Date().toDateString();
+
+        if (storedAttempts) setAttempts(Number(storedAttempts));
+        if (storedRemainingAttempts) setRemainingAttempts(Number(storedRemainingAttempts));
+        if (storedPreviousAttempts) setPreviousAttempts(storedPreviousAttempts);
+
+        const today = new Date().toDateString();
+        if (storedLastDate !== today) {
+          localStorage.setItem('remainingAttempts', 20);
+          setRemainingAttempts(20);
+          localStorage.setItem('lastDate', today);
+        }
+      }, []);
 
       const handleNumberChange = (e) => {
         const value = e.target.value.replace(/[^0-9]/g, '');
@@ -80,7 +93,7 @@
         setPreviousAttempts(newPreviousAttempts);
         setRemainingAttempts(20 - newAttempts);
 
-        if (number === CORRECT_NUMBER) {
+        if (getHash(number) === correctNumberHash) {
           setSuccess(true);
           setError('');
         } else {
@@ -88,12 +101,29 @@
         }
 
         setNumber('');
+        
+        // Store data in localStorage
+        localStorage.setItem('attempts', newAttempts);
+        localStorage.setItem('previousAttempts', JSON.stringify(newPreviousAttempts));
+        localStorage.setItem('remainingAttempts', 20 - newAttempts);
 
         // عرض الإعلان البيني بعد الضغط على الزر
         (adsbygoogle = window.adsbygoogle || []).push({
-          google_ad_slot: "7210545293", // وضع المعرف المناسب للإعلان
+          google_ad_slot: "7210545293",
           google_ad_width: 320,
           google_ad_height: 100
+        });
+      };
+
+      // دالة للحصول على التجزئة (hash) باستخدام SHA256
+      const getHash = (input) => {
+        const crypto = window.crypto || window.msCrypto; // for IE11
+        const encoder = new TextEncoder();
+        const data = encoder.encode(input);
+        return crypto.subtle.digest('SHA-256', data).then((hashBuffer) => {
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+          return hashHex;
         });
       };
 
