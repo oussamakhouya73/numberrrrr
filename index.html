@@ -4,181 +4,116 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Number Guessing Game</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f8f9fa;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    .card {
-      width: 100%;
-      max-width: 400px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      padding: 20px;
-      text-align: center;
-    }
-
-    .card-title {
-      font-size: 24px;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-
-    .input {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-    .button {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      background-color: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .button:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-
-    .alert {
-      margin: 10px 0;
-      padding: 10px;
-      background-color: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-      border-radius: 4px;
-    }
-
-    .success {
-      background-color: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
-
-    .attempts {
-      text-align: left;
-      margin-top: 20px;
-    }
-
-    .attempt {
-      background: #f1f3f5;
-      padding: 10px;
-      border-radius: 4px;
-      margin-bottom: 5px;
-    }
-  </style>
-</head>
-<body>
-  <div id="app"></div>
-
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+  
+  <!-- إضافة سكربت AdMob -->
+  <script async="true" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
   <script>
-    const CORRECT_NUMBER = '1234567';
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-8814544587352352",
+      enable_page_level_ads: true
+    });
+  </script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const CORRECT_NUMBER = '1234567'; // Replace with your desired winning number
     const REWARD_ACCOUNT = 'oussama_khouya_10';
 
-    const app = document.getElementById('app');
+    const NumberGuessingGame = () => {
+      const [number, setNumber] = React.useState('');
+      const [attempts, setAttempts] = React.useState(0);
+      const [previousAttempts, setPreviousAttempts] = React.useState([]);
+      const [error, setError] = React.useState('');
+      const [success, setSuccess] = React.useState(false);
+      const [remainingAttempts, setRemainingAttempts] = React.useState(20);
 
-    let attempts = 0;
-    let remainingAttempts = 20;
-    let previousAttempts = [];
-    let success = false;
+      const handleNumberChange = (e) => {
+        const value = e.target.value.replace(/[^0-9]/g, '');
+        if (value.length <= 7) {
+          setNumber(value);
+          setError('');
+        }
+      };
 
-    function render() {
-      app.innerHTML = `
-        <div class="card">
-          <div class="card-title">Number Guessing Game</div>
-          <div>Remaining attempts today: ${remainingAttempts}/20</div>
+      const handleSubmit = () => {
+        if (number.length !== 7) {
+          setError('Please enter exactly 7 digits');
+          return;
+        }
 
-          <input 
-            id="numberInput" 
-            type="text" 
-            placeholder="Enter a 7-digit number" 
-            class="input" 
-            ${success || remainingAttempts <= 0 ? 'disabled' : ''} 
-            maxlength="7"
+        if (remainingAttempts <= 0) {
+          setError('You have reached your daily limit of attempts');
+          return;
+        }
+
+        const newAttempts = attempts + 1;
+        const newPreviousAttempts = [...previousAttempts, number];
+        setAttempts(newAttempts);
+        setPreviousAttempts(newPreviousAttempts);
+        setRemainingAttempts(20 - newAttempts);
+
+        if (number === CORRECT_NUMBER) {
+          setSuccess(true);
+          setError('');
+        } else {
+          setError('This number is incorrect');
+        }
+
+        setNumber('');
+
+        // عرض إعلان بيني عند الضغط على الزر
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+
+      return (
+        <div className="w-full max-w-md mx-auto bg-white p-6 rounded shadow">
+          <h1 className="text-2xl font-bold mb-4">Number Guessing Game</h1>
+          <div className="text-sm text-gray-500 mb-4">Remaining attempts today: {remainingAttempts}/20</div>
+          <input
+            type="text"
+            value={number}
+            onChange={handleNumberChange}
+            placeholder="Enter a 7-digit number"
+            className="block w-full p-2 border border-gray-300 rounded mb-4 text-center"
+            maxLength={7}
+            disabled={success || remainingAttempts <= 0}
           />
-
-          <button 
-            id="submitButton" 
-            class="button" 
-            ${success || remainingAttempts <= 0 ? 'disabled' : ''}
+          {error && <div className="text-red-500 mb-2">{error}</div>}
+          {success && (
+            <div className="text-green-500 mb-4">
+              Congratulations, you found the correct number!
+              <div>Send it to this account to claim your reward: {REWARD_ACCOUNT}</div>
+            </div>
+          )}
+          <button
+            onClick={handleSubmit}
+            className="w-full bg-blue-500 text-white py-2 rounded"
+            disabled={success || remainingAttempts <= 0 || number.length !== 7}
           >
             Submit Number
           </button>
-
-          <div id="message"></div>
-
-          <div class="attempts">
-            <h3>Previous Attempts:</h3>
-            ${previousAttempts.map(attempt => <div class="attempt">${attempt}</div>).join('')}
-          </div>
+          {previousAttempts.length > 0 && (
+            <div className="mt-4">
+              <h3 className="text-sm font-medium mb-2">Previous Attempts:</h3>
+              {previousAttempts.map((attempt, index) => (
+                <div key={index} className="text-sm p-2 bg-gray-50 rounded mb-1">
+                  {attempt}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      `;
+      );
+    };
 
-      document.getElementById('submitButton').onclick = handleSubmit;
-      const inputField = document.getElementById('numberInput');
-      inputField.oninput = handleInputChange;
-    }
-
-    function handleInputChange(e) {
-      const inputField = e.target;
-      inputField.value = inputField.value.replace(/[^0-9]/g, '').slice(0, 7);
-    }
-
-    function handleSubmit() {
-      const numberInput = document.getElementById('numberInput');
-      const number = numberInput.value;
-      const messageElement = document.getElementById('message');
-
-      messageElement.innerHTML = '';
-
-      if (number.length !== 7) {
-        messageElement.innerHTML = '<div class="alert">Please enter exactly 7 digits</div>';
-        return;
-      }
-
-      if (remainingAttempts <= 0) {
-        messageElement.innerHTML = '<div class="alert">You have reached your daily limit of attempts</div>';
-        return;
-      }
-
-      attempts++;
-      remainingAttempts--;
-      previousAttempts.push(number);
-
-      if (number === CORRECT_NUMBER) {
-        success = true;
-        messageElement.innerHTML = `
-          <div class="alert success">
-            Congratulations, you found the correct number! 
-            <br>
-            Send it to this account to claim your reward: ${REWARD_ACCOUNT}
-          </div>
-        `;
-      } else {
-        messageElement.innerHTML = '<div class="alert">This number is incorrect</div>';
-      }
-
-      render();
-    }
-
-    render();
+    ReactDOM.createRoot(document.getElementById('root')).render(<NumberGuessingGame />);
   </script>
 </body>
 </html>
